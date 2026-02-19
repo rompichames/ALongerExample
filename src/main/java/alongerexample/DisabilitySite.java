@@ -1,5 +1,6 @@
 package alongerexample;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class DisabilitySite {
@@ -20,14 +21,15 @@ public class DisabilitySite {
 		_readings[i] = newReading;
 	}
 
-	@SuppressWarnings("deprecation")
 	public Dollars charge() {
 		int i;
 		for (i = 0; _readings[i] != null; i++);
 		int usage = _readings[i-1].amount() - _readings[i-2].amount();
 		Date end = _readings[i-1].date();
-		Date start = _readings[i-2].date();
-		start.setDate(start.getDate() + 1); //set to begining of period
+		Calendar cal =  Calendar.getInstance();
+		cal.setTime(end);
+		cal.add(Calendar.DAY_OF_YEAR, 1);
+		Date start = cal.getTime();
 		return charge(usage, start, end);
 	}
 
@@ -61,57 +63,10 @@ public class DisabilitySite {
 		return result;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private int dayOfYear(Date arg) {
-		int result;
-		switch (arg.getMonth()) {
-		case 0:
-			result = 0;
-			break;
-		case 1:
-			result = 31;
-			break;
-		case 2:
-			result = 59;
-			break;
-		case 3:
-			result = 90;
-			break;
-		case 4:
-			result = 120;
-			break;
-		case 5:
-			result = 151;
-			break;
-		case 6:
-			result = 181;
-			break;
-		case 7:
-			result = 212;
-			break;
-		case 8:
-			result = 243;
-			break;
-		case 9:
-			result = 273;
-			break;
-		case 10:
-			result = 304;
-			break;
-		case 11:
-			result = 334;
-			break;
-		default :
-			throw new IllegalArgumentException();
-		}
-		
-		result += arg.getDate();
-		//check leap year
-		if ((arg.getYear()%4 == 0) && ((arg.getYear() % 100 != 0) ||
-				((arg.getYear() + 1900) % 400 == 0))) {
-			result++;
-		}
-		return result;
+		Calendar cal =  Calendar.getInstance();
+		cal.setTime(arg);
+		return cal.get(Calendar.DAY_OF_YEAR);
 	}
 
 
