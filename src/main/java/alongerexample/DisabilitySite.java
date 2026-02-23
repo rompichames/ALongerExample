@@ -27,24 +27,8 @@ public class DisabilitySite extends Site{
 
 	private Dollars charge(int fullUsage, Date start, Date end) {
 		Dollars result;
-		double summerFraction;
+		double summerFraction =  summerFraction(start, end);
 		int usage = Math.min(fullUsage, CAP);
-		if (start.after(_zone.summerEnd()) || end.before(_zone.summerStart()))
-			summerFraction = 0;
-		else if (!start.before(_zone.summerStart()) && !start.after(_zone.summerEnd()) &&
-				!end.before(_zone.summerStart()) && !end.after(_zone.summerEnd()))
-			summerFraction = 1;
-		else {
-			double summerDays;
-			if (start.before(_zone.summerStart()) || start.after(_zone.summerEnd())) {
-				// end is in the summer
-				summerDays = dayOfYear(end) - dayOfYear (_zone.summerStart()) + 1;
-			} else {
-				// start is in summer
-				summerDays = dayOfYear(_zone.summerEnd()) - dayOfYear (start) + 1;
-			};
-			summerFraction = summerDays / (dayOfYear(end) - dayOfYear(start) + 1);
-		};
 		result = new Dollars((usage * _zone.summerRate() * summerFraction) +
 				(usage * _zone.winterRate() * (1 - summerFraction)));
 		result = result.plus(new Dollars(Math.max(fullUsage - usage, 0) * 0.062));
@@ -53,12 +37,6 @@ public class DisabilitySite extends Site{
 		result = result.plus(fuel);
 		result = new Dollars(result.plus(fuel.times(TAX_RATE).min(FUEL_TAX_CAP)));
 		return result;
-	}
-	
-	private int dayOfYear(Date arg) {
-		Calendar cal =  Calendar.getInstance();
-		cal.setTime(arg);
-		return cal.get(Calendar.DAY_OF_YEAR);
 	}
 
 
