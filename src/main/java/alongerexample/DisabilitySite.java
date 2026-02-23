@@ -3,22 +3,14 @@ package alongerexample;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DisabilitySite {
+public class DisabilitySite extends Site{
 
-	private Reading[] _readings = new Reading[1000];
 	private static final Dollars FUEL_TAX_CAP = new Dollars(0.10);
 	private static final double TAX_RATE = 0.05;
-	private Zone _zone;
 	private static final int CAP = 200;
-	
-	public DisabilitySite (Zone zone) {
-		_zone = zone;
-	}
 
-	public void addReading(Reading newReading) {
-		int i;
-		for (i = 0; _readings[i] != null; i++);
-		_readings[i] = newReading;
+	public DisabilitySite(Zone zone) {
+		super(zone);
 	}
 
 	public Dollars charge() {

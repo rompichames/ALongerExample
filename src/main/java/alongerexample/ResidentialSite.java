@@ -3,21 +3,12 @@ package alongerexample;
 import java.util.Calendar;
 import java.util.Date;
 
-public class ResidentialSite {
+public class ResidentialSite extends Site{
 
-	private Reading[] _readings = new Reading[1000];
 	private static final double TAX_RATE = 0.05;
-	private Zone _zone;
 
 	public ResidentialSite (Zone zone) {
-		_zone = zone;
-	}
-
-	public void addReading(Reading newReading) {
-		// add reading to end of array
-		int i = 0;
-		while (_readings[i] != null) i++;
-		_readings[i] = newReading;
+		super(zone);
 	}
 
 	public Dollars charge() {
