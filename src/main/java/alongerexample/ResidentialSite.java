@@ -9,8 +9,8 @@ public class ResidentialSite extends Site{
 	}
 
 	@Override
-	protected Dollars baseCharge(Date start, Date end) {
-		double summerFraction = summerFraction(start, end);
+	protected Dollars baseCharge() {
+		double summerFraction = summerFraction();
 		int usage = lastUsage();
 		return new Dollars((usage * _zone.summerRate() * summerFraction) +
 				(usage * _zone.winterRate() * (1 - summerFraction)));

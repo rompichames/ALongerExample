@@ -30,7 +30,11 @@ public abstract class Site {
         return cal.get(Calendar.DAY_OF_YEAR);
     }
 
-    public double summerFraction(Date start, Date end) {
+    public double summerFraction() {
+        DateRange period = lastPeriod();
+        Date start = period.start();
+        Date end = period.end();
+
         if (start.after(_zone.summerEnd()) || end.before(_zone.summerStart()))
             return 0;
         else if (!start.before(_zone.summerStart()) && !start.after(_zone.summerEnd()) &&
@@ -49,10 +53,6 @@ public abstract class Site {
         }
     }
 
-    public Dollars charge() {
-        return charge(lastReading().date(), nextDay(previousReading().date()));
-    }
-
     protected Dollars fuelCharge() {
         return new Dollars(FUEL_CHARGE_RATE * lastUsage());
     }
@@ -61,16 +61,16 @@ public abstract class Site {
         return new Dollars(amount.times(TAX_RATE));
     }
 
-    protected Dollars charge(Date start, Date end) {
+    public Dollars charge() {
         Dollars result;
-        result = baseCharge(start, end);
+        result = baseCharge();
         result = result.plus(taxes(result));
         result = result.plus(fuelCharge());
         result = result.plus(fuelChargeTaxes());
         return result;
     }
 
-    protected abstract Dollars baseCharge(Date start, Date end);
+    protected abstract Dollars baseCharge();
     protected abstract Dollars fuelChargeTaxes();
 
     protected Reading lastReading() {
@@ -90,5 +90,9 @@ public abstract class Site {
         cal.setTime(date);
         cal.add(Calendar.DAY_OF_YEAR, 1);
         return cal.getTime();
+    }
+
+    public DateRange lastPeriod() {
+        return new DateRange(nextDay(previousReading().date()), lastReading().date());
     }
 }

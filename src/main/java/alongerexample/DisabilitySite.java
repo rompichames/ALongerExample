@@ -12,8 +12,8 @@ public class DisabilitySite extends Site{
 	}
 
 	@Override
-	protected Dollars baseCharge( Date start, Date end) {
-		double summerFraction = summerFraction(start, end);
+	protected Dollars baseCharge() {
+		double summerFraction = summerFraction();
 		int usage = lastUsage();
 		int minUsage = Math.min(usage, CAP);
 

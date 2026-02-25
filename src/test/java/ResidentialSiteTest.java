@@ -51,7 +51,7 @@ public class ResidentialSiteTest {
         // mai → hiver juin → été
         _residentialSite.addReading(new Reading(100, _sdf.parse("25 May 2024")));
         _residentialSite.addReading(new Reading(200, _sdf.parse("5 Jun 2024")));
-        assertEquals(9.19d, _residentialSite.charge().amount());
+        assertEquals(8.72d, _residentialSite.charge().amount());
     }
 
 }
