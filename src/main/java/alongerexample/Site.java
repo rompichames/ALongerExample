@@ -7,6 +7,7 @@ public abstract class Site {
     public Zone _zone;
     public Reading[] _readings = new Reading[1000];
     protected static final double TAX_RATE = 0.05;
+    protected static final double FUEL_CHARGE_RATE = 0.0175;
 
     public Site(Zone zone) {
         _zone = zone;
@@ -52,6 +53,14 @@ public abstract class Site {
         Date end = lastReading().date();
         Date start = nextDay(previousReading().date());
         return charge(lastUsage(), start, end);
+    }
+
+    protected Dollars fuelCharge(int usage) {
+        return new Dollars(FUEL_CHARGE_RATE * usage);
+    }
+
+    protected Dollars taxes(Dollars amount) {
+        return new Dollars(amount.times(TAX_RATE));
     }
 
     protected Dollars charge(int fullUsage, Date start, Date end) {

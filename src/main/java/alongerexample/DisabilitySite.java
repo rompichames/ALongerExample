@@ -6,8 +6,7 @@ import java.util.Date;
 public class DisabilitySite extends Site{
 
 	private static final Dollars FUEL_TAX_CAP = new Dollars(0.10);
-	private static final double TAX_RATE = 0.05;
-	private static final Dollars CAP = new Dollars(200);
+	private static final int CAP = 200;
 
 	public DisabilitySite(Zone zone) {
 		super(zone);
@@ -29,20 +28,23 @@ public class DisabilitySite extends Site{
 	protected Dollars charge(int usage, Date start, Date end) {
 		// calcul de la fraction d'été
 		double summerFraction = summerFraction(start, end);
+		int minUsage = Math.min(usage, CAP);
 
 		// calcul du montant de base (été vs hiver)
 		Dollars base = new Dollars((usage * _zone.summerRate() * summerFraction) +
 				(usage * _zone.winterRate() * (1 - summerFraction)));
 
-		Dollars limitedBase = base.min(CAP);
-
-		// calcul taxe sur montant plafonné
-		Dollars tax = new Dollars(limitedBase.times(TAX_RATE));
+		base = base.plus(new Dollars(Math.max(usage - minUsage, 0) * 0.062));
 
 		// calcul du fuel et de sa taxe avec son plafond
-		Dollars fuel = new Dollars(usage * 0.0175);
-		Dollars fuelTax = new Dollars(fuel.times(TAX_RATE)).min(FUEL_TAX_CAP);
+		base = base.plus(taxes(base));
+		base = base.plus(fuelCharge(usage));
+		base = base.plus(fuelChargeTaxes(usage));
 
-		return limitedBase.plus(tax).plus(fuel).plus(fuelTax);
+		return base;
+	}
+
+	protected Dollars fuelChargeTaxes(int usage) {
+		return new Dollars(fuelCharge(usage).times(TAX_RATE).min(FUEL_TAX_CAP));
 	}
 }
