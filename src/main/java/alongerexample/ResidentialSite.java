@@ -9,13 +9,14 @@ public class ResidentialSite extends Site{
 	}
 
 	@Override
-	protected Dollars baseCharge(int usage, Date start, Date end) {
+	protected Dollars baseCharge(Date start, Date end) {
 		double summerFraction = summerFraction(start, end);
+		int usage = lastUsage();
 		return new Dollars((usage * _zone.summerRate() * summerFraction) +
 				(usage * _zone.winterRate() * (1 - summerFraction)));
 	}
 
-	protected Dollars fuelChargeTaxes(int usage) {
-		return taxes(fuelCharge(usage));
+	protected Dollars fuelChargeTaxes() {
+		return taxes(fuelCharge());
 	}
 }

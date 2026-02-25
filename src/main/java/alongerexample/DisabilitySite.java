@@ -12,8 +12,9 @@ public class DisabilitySite extends Site{
 	}
 
 	@Override
-	protected Dollars baseCharge(int usage, Date start, Date end) {
+	protected Dollars baseCharge( Date start, Date end) {
 		double summerFraction = summerFraction(start, end);
+		int usage = lastUsage();
 		int minUsage = Math.min(usage, CAP);
 
 		Dollars base = new Dollars((minUsage * _zone.summerRate() * summerFraction) +
@@ -23,7 +24,7 @@ public class DisabilitySite extends Site{
 	}
 
 	@Override
-	protected Dollars fuelChargeTaxes(int usage) {
-		return taxes(fuelCharge(usage)).min(FUEL_TAX_CAP);
+	protected Dollars fuelChargeTaxes() {
+		return taxes(fuelCharge()).min(FUEL_TAX_CAP);
 	}
 }

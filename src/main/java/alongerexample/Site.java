@@ -50,30 +50,28 @@ public abstract class Site {
     }
 
     public Dollars charge() {
-        return charge(lastUsage(), lastReading().date(), nextDay(previousReading().date()));
+        return charge(lastReading().date(), nextDay(previousReading().date()));
     }
 
-    protected Dollars fuelCharge(int usage) {
-        return new Dollars(FUEL_CHARGE_RATE * usage);
+    protected Dollars fuelCharge() {
+        return new Dollars(FUEL_CHARGE_RATE * lastUsage());
     }
 
     protected Dollars taxes(Dollars amount) {
         return new Dollars(amount.times(TAX_RATE));
     }
 
-    protected Dollars charge(int usage, Date start, Date end) {
+    protected Dollars charge(Date start, Date end) {
         Dollars result;
-        result = baseCharge(usage, start, end);
+        result = baseCharge(start, end);
         result = result.plus(taxes(result));
-        result = result.plus(fuelCharge(usage));
-        result = result.plus(fuelChargeTaxes(usage));
+        result = result.plus(fuelCharge());
+        result = result.plus(fuelChargeTaxes());
         return result;
     }
 
-    protected abstract Dollars baseCharge(int usage, Date start, Date end);
-    protected abstract Dollars fuelChargeTaxes(int usage);
-
-
+    protected abstract Dollars baseCharge(Date start, Date end);
+    protected abstract Dollars fuelChargeTaxes();
 
     protected Reading lastReading() {
         return _readings[firstUnusedReadingsIndex() - 1];
