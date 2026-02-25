@@ -46,4 +46,8 @@ public class Zone {
 	public double summerRate() {
 		return _summerRate;
 	}
+
+	public DateRange summer() {
+		return new DateRange(_summerStart, _summerEnd);
+	}
 }

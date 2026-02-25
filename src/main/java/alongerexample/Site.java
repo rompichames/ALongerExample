@@ -32,25 +32,23 @@ public abstract class Site {
 
     public double summerFraction() {
         DateRange period = lastPeriod();
-        Date start = period.start();
-        Date end = period.end();
+        DateRange summer = _zone.summer();
 
-        if (start.after(_zone.summerEnd()) || end.before(_zone.summerStart()))
+        if (period.disjoint(summer)) {
             return 0;
-        else if (!start.before(_zone.summerStart()) && !start.after(_zone.summerEnd()) &&
-                !end.before(_zone.summerStart()) && !end.after(_zone.summerEnd()))
-            return 1;
-        else {
-            double summerDays;
-            if (start.before(_zone.summerStart()) || start.after(_zone.summerEnd())) {
-                // end is in the summer
-                summerDays = dayOfYear(end) - dayOfYear (_zone.summerStart()) + 1;
-            } else {
-                // start is in summer
-                summerDays = dayOfYear(_zone.summerEnd()) - dayOfYear (start) + 1;
-            }
-            return summerDays / (dayOfYear(end) - dayOfYear(start) + 1);
         }
+
+        if (summer.contains(period)) {
+            return 1;
+        }
+
+        double summerDays;
+        if (period.start().before(summer.start()) || period.start().after(summer.end())) {
+            summerDays = dayOfYear(period.end()) - dayOfYear(summer.start()) + 1;
+        } else {
+            summerDays = dayOfYear(summer.end()) - dayOfYear(period.start()) + 1;
+        }
+        return summerDays / (dayOfYear(period.end()) - dayOfYear(period.start()) + 1);
     }
 
     protected Dollars fuelCharge() {
@@ -92,5 +90,9 @@ public abstract class Site {
 
     public DateRange lastPeriod() {
         return new DateRange(nextDay(previousReading().date()), lastReading().date());
+    }
+
+    private boolean isLastPeriodOutsideSummer() {
+        return lastPeriod().disjoint(_zone.summer());
     }
 }

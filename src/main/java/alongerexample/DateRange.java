@@ -13,4 +13,12 @@ public class DateRange {
 
     public Date start() { return _start; }
     public Date end() { return _end; }
+
+    public boolean disjoint(DateRange other) {
+        return _start.after(other.end()) || _end.before(other.start());
+    }
+
+    public boolean contains(DateRange other) {
+        return (!other.start().before(_start)) && (!other.end().after(_end));
+    }
 }
