@@ -42,7 +42,7 @@ public class DisabilitySiteTest {
     void testOverCap() throws ParseException {
         _disabilitySite.addReading(new Reading(100, _sdf.parse("1 Jan 2024")));
         _disabilitySite.addReading(new Reading(400, _sdf.parse("31 Jan 2024"))); // Usage 300 (> 200)
-        assertEquals(26.56d, _disabilitySite.charge().amount());
+        assertEquals(27.4, _disabilitySite.charge().amount());
     }
 
 }

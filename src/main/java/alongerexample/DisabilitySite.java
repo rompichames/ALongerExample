@@ -7,7 +7,7 @@ public class DisabilitySite extends Site{
 
 	private static final Dollars FUEL_TAX_CAP = new Dollars(0.10);
 	private static final double TAX_RATE = 0.05;
-	private static final int CAP = 200;
+	private static final Dollars CAP = new Dollars(200);
 
 	public DisabilitySite(Zone zone) {
 		super(zone);
@@ -25,19 +25,24 @@ public class DisabilitySite extends Site{
 		return charge(usage, start, end);
 	}
 
-	private Dollars charge(int fullUsage, Date start, Date end) {
-		Dollars result;
-		double summerFraction =  summerFraction(start, end);
-		int usage = Math.min(fullUsage, CAP);
-		result = new Dollars((usage * _zone.summerRate() * summerFraction) +
+	@Override
+	protected Dollars charge(int usage, Date start, Date end) {
+		// calcul de la fraction d'été
+		double summerFraction = summerFraction(start, end);
+
+		// calcul du montant de base (été vs hiver)
+		Dollars base = new Dollars((usage * _zone.summerRate() * summerFraction) +
 				(usage * _zone.winterRate() * (1 - summerFraction)));
-		result = result.plus(new Dollars(Math.max(fullUsage - usage, 0) * 0.062));
-		result = result.plus(new Dollars(result.times(TAX_RATE)));
-		Dollars fuel = new Dollars(fullUsage * 0.0175);
-		result = result.plus(fuel);
-		result = new Dollars(result.plus(fuel.times(TAX_RATE).min(FUEL_TAX_CAP)));
-		return result;
+
+		Dollars limitedBase = base.min(CAP);
+
+		// calcul taxe sur montant plafonné
+		Dollars tax = new Dollars(limitedBase.times(TAX_RATE));
+
+		// calcul du fuel et de sa taxe avec son plafond
+		Dollars fuel = new Dollars(usage * 0.0175);
+		Dollars fuelTax = new Dollars(fuel.times(TAX_RATE)).min(FUEL_TAX_CAP);
+
+		return limitedBase.plus(tax).plus(fuel).plus(fuelTax);
 	}
-
-
 }
