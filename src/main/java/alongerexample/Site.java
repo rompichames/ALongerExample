@@ -24,31 +24,22 @@ public abstract class Site {
         return i;
     }
 
-    public int dayOfYear(Date arg) {
-        Calendar cal =  Calendar.getInstance();
-        cal.setTime(arg);
-        return cal.get(Calendar.DAY_OF_YEAR);
-    }
-
     public double summerFraction() {
-        DateRange period = lastPeriod();
-        DateRange summer = _zone.summer();
+        double summerFraction;
 
-        if (period.disjoint(summer)) {
-            return 0;
+        if (lastPeriod().disjoint(_zone.summer())) {
+            summerFraction = 0;
         }
-
-        if (summer.contains(period)) {
-            return 1;
+        else {
+            if (_zone.summer().contains(lastPeriod())) {
+                summerFraction = 1;
+            }
+            else {
+                int summerDays = lastPeriod().intersection(_zone.summer()).length();
+                summerFraction = (double) summerDays / lastPeriod().length();
+            }
         }
-
-        double summerDays;
-        if (period.start().before(summer.start()) || period.start().after(summer.end())) {
-            summerDays = dayOfYear(period.end()) - dayOfYear(summer.start()) + 1;
-        } else {
-            summerDays = dayOfYear(summer.end()) - dayOfYear(period.start()) + 1;
-        }
-        return summerDays / (dayOfYear(period.end()) - dayOfYear(period.start()) + 1);
+        return summerFraction;
     }
 
     protected Dollars fuelCharge() {
@@ -90,9 +81,5 @@ public abstract class Site {
 
     public DateRange lastPeriod() {
         return new DateRange(nextDay(previousReading().date()), lastReading().date());
-    }
-
-    private boolean isLastPeriodOutsideSummer() {
-        return lastPeriod().disjoint(_zone.summer());
     }
 }

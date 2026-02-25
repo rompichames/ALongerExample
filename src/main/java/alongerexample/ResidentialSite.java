@@ -1,6 +1,5 @@
 package alongerexample;
 
-import java.util.Date;
 
 public class ResidentialSite extends Site{
 

@@ -1,7 +1,5 @@
 package alongerexample;
 
-import java.util.Date;
-
 public class DisabilitySite extends Site{
 
 	private static final Dollars FUEL_TAX_CAP = new Dollars(0.10);
