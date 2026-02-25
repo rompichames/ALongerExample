@@ -62,12 +62,10 @@ public abstract class Site {
     }
 
     public Dollars charge() {
-        Dollars result;
-        result = baseCharge();
-        result = result.plus(taxes(result));
-        result = result.plus(fuelCharge());
-        result = result.plus(fuelChargeTaxes());
-        return result;
+        return baseCharge()
+                .plus(taxes(baseCharge()))
+                .plus(fuelCharge())
+                .plus(fuelChargeTaxes());
     }
 
     protected abstract Dollars baseCharge();
