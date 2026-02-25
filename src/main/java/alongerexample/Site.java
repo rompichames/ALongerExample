@@ -50,9 +50,7 @@ public abstract class Site {
     }
 
     public Dollars charge() {
-        Date end = lastReading().date();
-        Date start = nextDay(previousReading().date());
-        return charge(lastUsage(), start, end);
+        return charge(lastUsage(), lastReading().date(), nextDay(previousReading().date()));
     }
 
     protected Dollars fuelCharge(int usage) {
@@ -63,19 +61,19 @@ public abstract class Site {
         return new Dollars(amount.times(TAX_RATE));
     }
 
-    protected Dollars charge(int fullUsage, Date start, Date end) {
-        double summerFraction = summerFraction(start, end);
+    protected Dollars charge(int usage, Date start, Date end) {
+        Dollars result;
+        result = baseCharge(usage, start, end);
+        result = result.plus(taxes(result));
+        result = result.plus(fuelCharge(usage));
+        result = result.plus(fuelChargeTaxes(usage));
+        return result;
+    }
 
-        // Calcul de base selon les taux de la zone
-        Dollars result = new Dollars((fullUsage * _zone.summerRate() * summerFraction) +
-                (fullUsage * _zone.winterRate() * (1 - summerFraction)));
+    protected abstract Dollars baseCharge(int usage, Date start, Date end);
+    protected abstract Dollars fuelChargeTaxes(int usage);
 
-        // Logique de taxes et fuel commune
-        result = result.plus(new Dollars(result.times(TAX_RATE)));
-        Dollars fuel = new Dollars(fullUsage * 0.0175);
-        result = result.plus(fuel);
-        return new Dollars(result.plus(fuel.times(TAX_RATE)));
-    };
+
 
     protected Reading lastReading() {
         return _readings[firstUnusedReadingsIndex() - 1];
